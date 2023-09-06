@@ -1,4 +1,4 @@
-name: Read and Print Yaml File
+name: Print changed file path
 
 on:
   push:
@@ -6,41 +6,13 @@ on:
       - main
 
 jobs:
-  read-json:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Read and Print YAML File
-      id: read-yaml
-      run: |
-        # Read the contents of ./build/pepperx/destination.yaml
-        yaml_content=$(cat build/pepperx/destination.yaml)
-        
-        # Use yq to extract the value of the "environment" key
-        var_environment=$(echo "$yaml_content" | yq e '.environment' -)
-        var_app_custom_id=$(echo "$yaml_content" | yq e '.app_custom_id' -)
-        var_message=$(echo "$yaml_content" | yq e '.message' -)
-        
-        # Set the var_environment as an environment variable for this step
-        echo "var_environment=$var_environment" >> $GITHUB_ENV
-        echo "var_app_custom_id=$var_app_custom_id" >> $GITHUB_ENV
-        echo "var_message=$var_message" >> $GITHUB_ENV
-
-    - name: Make a Curl Call
-      run: |
-        # Access the var_environment from the environment variable
-        var_environment="${{ env.var_environment }}"
-        var_app_custom_id="${{ env.var_app_custom_id }}"
-        var_message="${{ env.var_message }}"
-
-        echo "Environment Value ARE ---:"
-        echo "$var_environment"
-        echo "$var_app_custom_id"
-        echo "$var_message"
-        
-        echo "Strting CURL call"
-        curl -X GET "https://hunter.nikhilmiranda.com/health"
-        echo "Ending CURL call"
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Print changed file path
+        run: |
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | while read file; do
+            echo "Changed file path: $file"
+          done
