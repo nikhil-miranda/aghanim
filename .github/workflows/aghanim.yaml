@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set Commit Message Environment Variable
         id: set_commit_message
@@ -23,7 +23,7 @@ jobs:
       - name: Split Commit Message
         id: split_commit_message
         run: |
-          IFS='---' read -ra SPLIT_MESSAGES <<< "${{ env.COMMIT_MESSAGE }}"
+          SPLIT_MESSAGES=($(echo "$COMMIT_MESSAGE" | tr '---' '\n'))
           echo "Split Messages: ${SPLIT_MESSAGES[@]}"
           if [ "${#SPLIT_MESSAGES[@]}" -ge 1 ]; then
             echo "SPLIT_MESSAGE_1=${SPLIT_MESSAGES[0]}" >> $GITHUB_ENV
