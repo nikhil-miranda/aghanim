@@ -25,6 +25,10 @@ jobs:
         run: |
           commit_message="${{ steps.commit_message.outputs.message }}"
           IFS='---' read -ra message_parts <<< "$commit_message"
-          for part in "${message_parts[@]}"; do
-            echo "Split Message Part: $part"
-          done
+          echo ($message_parts[0])
+          echo ($message_parts[0\1])
+          echo ($message_parts[2])
+
+          # for part in "${message_parts[@]}"; do
+          #   echo "Split Message Part: $part"
+          # done
