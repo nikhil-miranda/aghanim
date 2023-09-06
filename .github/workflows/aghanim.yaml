@@ -1,20 +1,27 @@
-name: Get commit message and split
+name: Process Commit Message
 
-on:
+on: 
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
-  get-commit-message:
+  split-message:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Get commit message
+      - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.head_commit.ref }}
+
+      - name: Get commit message
+        id: commit
+        run: |
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.event.after }})
+          echo "message=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Split commit message
+        id: split
         run: |
-          echo "Commit message: ${{ github.event.head_commit.message }}"
+          IFS='---' read -ra ADDR <<< "${{ env.message }}"
+          for i in "${ADDR[@]}"; do
+            echo "part: $i"
+          done
