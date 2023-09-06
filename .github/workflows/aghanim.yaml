@@ -13,6 +13,11 @@ jobs:
         uses: actions/checkout@v3
       - name: Print changed file path
         run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | while read file; do
-            echo "Changed file path: $file"
-          done
+          # Get the SHA of the current commit
+          current_commit_sha=$(git rev-parse HEAD)
+
+          # Get the path of the file that was changed in the current commit
+          changed_file_path=$(git diff-tree --no-commit-id --name-only -r $current_commit_sha)
+
+          # Print the path of the changed file
+          echo "Changed file path: $changed_file_path"
