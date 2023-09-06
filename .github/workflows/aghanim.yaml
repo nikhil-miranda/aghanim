@@ -25,10 +25,14 @@ jobs:
         run: |
           commit_message="${{ steps.commit_message.outputs.message }}"
           IFS='---' read -ra message_parts <<< "$commit_message"
-          echo ($message_parts[0])
-          echo ($message_parts[0\1])
-          echo ($message_parts[2])
-
-          # for part in "${message_parts[@]}"; do
-          #   echo "Split Message Part: $part"
-          # done
+          if [ "${#message_parts[@]}" -eq 3 ]; then
+            Environment="${message_parts[0]}"
+            APP_CUSTOM_ID="${message_parts[1]}"
+            message="${message_parts[2]}"
+            echo "Environment: $Environment"
+            echo "APP_CUSTOM_ID: $APP_CUSTOM_ID"
+            echo "message: $message"
+          else
+            echo "Invalid commit message format. Expected 3 parts separated by '---'."
+            exit 1
+          fi
