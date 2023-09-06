@@ -11,13 +11,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Print changed file path
         run: |
           # Get the SHA of the current commit
           current_commit_sha=$(git rev-parse HEAD)
 
+          # Get the SHA of the previous commit
+          previous_commit_sha=$(git rev-parse HEAD~1)
+
           # Get the path of the file that was changed in the current commit
-          changed_file_path=$(git diff-tree --no-commit-id --name-only -r $current_commit_sha)
+          changed_file_path=$(git diff --name-only $previous_commit_sha $current_commit_sha)
 
           # Print the path of the changed file
           echo "Changed file path: $changed_file_path"
