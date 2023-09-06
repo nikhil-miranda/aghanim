@@ -1,0 +1,20 @@
+name: Get commit message and split
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  get-commit-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get commit message
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.head_commit.ref }}
+
+      - name: Split commit message
+        run: |
+          echo "Commit message: ${{ github.event.head_commit.message }}"
