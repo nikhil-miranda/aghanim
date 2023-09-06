@@ -21,7 +21,7 @@ jobs:
       - name: Split commit message
         id: split
         run: |
-          IFS='---' read -ra PARTS <<< "${{ env.message }}"
-          echo "Environment=${PARTS[0]}" >> $GITHUB_ENV
-          echo "APP_CUSTOM_ID=${PARTS[1]}" >> $GITHUB_ENV
-          echo "message=${PARTS[2]}" >> $GITHUB_ENV
+          IFS='---' read -ra ADDR <<< "${{ env.message }}"
+          for i in "${ADDR[@]}"; do
+            echo "part: $i"
+          done
