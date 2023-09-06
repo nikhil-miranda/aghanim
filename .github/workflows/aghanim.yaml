@@ -1,38 +1,36 @@
-name: Split Commit Message
+name: Extract Commit Message
 
 on:
   push:
     branches:
-      - main # You can specify the branch you want to trigger this on
+      - main # Replace with the branch you want to trigger the workflow on
 
 jobs:
-  split-commit-message:
+  extract_commit_message:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get Commit Message
-        id: commit_message
+      - name: Set Commit Message Environment Variable
+        id: set_commit_message
         run: |
-          commit_message="$(git log --format=%B -n 1 ${{ github.sha }})"
-          echo "::set-output name=message::$commit_message"
-
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.sha }})
+          echo "Commit Message: $COMMIT_MESSAGE"
+          echo "::set-env name=COMMIT_MESSAGE::$COMMIT_MESSAGE"
+        
       - name: Split Commit Message
-        id: split_message
-        if: steps.commit_message.outputs.message != ''
+        id: split_commit_message
         run: |
-          commit_message="${{ steps.commit_message.outputs.message }}"
-          IFS='---' read -ra message_parts <<< "$commit_message"
-          if [ "${#message_parts[@]}" -eq 3 ]; then
-            Environment="${message_parts[0]}"
-            APP_CUSTOM_ID="${message_parts[1]}"
-            message="${message_parts[2]}"
-            echo "Environment: $Environment"
-            echo "APP_CUSTOM_ID: $APP_CUSTOM_ID"
-            echo "message: $message"
-          else
-            echo "Invalid commit message format. Expected 3 parts separated by '---'."
-            exit 1
-          fi
+          IFS='---' read -ra SPLIT_MESSAGES <<< "${{ env.COMMIT_MESSAGE }}"
+          echo "Split Messages: ${SPLIT_MESSAGES[@]}"
+          echo "::set-env name=SPLIT_MESSAGE_1::${SPLIT_MESSAGES[0]}"
+          echo "::set-env name=SPLIT_MESSAGE_2::${SPLIT_MESSAGES[1]}"
+          echo "::set-env name=SPLIT_MESSAGE_3::${SPLIT_MESSAGES[2]}"
+
+      - name: Use the Split Messages
+        run: |
+          echo "Split Message 1: ${{ env.SPLIT_MESSAGE_1 }}"
+          echo "Split Message 2: ${{ env.SPLIT_MESSAGE_2 }}"
+          echo "Split Message 3: ${{ env.SPLIT_MESSAGE_3 }}"
