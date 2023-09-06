@@ -14,6 +14,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Read and Print YAML File
+      id: read-yaml
       run: |
         # Read the contents of ./build/pepperx/destination.yaml
         yaml_content=$(cat build/pepperx/destination.yaml)
@@ -21,6 +22,17 @@ jobs:
         # Use yq to extract the value of the "environment" key
         environment_value=$(echo "$yaml_content" | yq e '.environment' -)
         
-        # Print the environment value
+        # Set the environment_value as an environment variable for this step
+        echo "Environment Value:"
+        echo "ENVIRONMENT_VALUE=$environment_value" >> $GITHUB_ENV
+
+    - name: Make a Curl Call
+      run: |
+        # Access the environment_value from the environment variable
+        environment_value="${{ env.ENVIRONMENT_VALUE }}"
         echo "Environment Value:"
         echo "$environment_value"
+        
+        # Now you can use $environment_value in your curl call
+        # Replace the following line with your actual curl command
+        curl -X GET "https://hunter.nikhilmiranda.com"
