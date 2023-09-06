@@ -20,8 +20,13 @@ jobs:
 
       - name: Split commit message
         id: split
+        uses: ./.github/actions/split-commit-message
+        with:
+          delimiter: '---'
+          message: ${{ env.message }}
+
+      - name: Print environment variables
         run: |
-          IFS='---' read -ra ADDR <<< "${{ env.message }}"
-          echo "Environment=${ADDR[0]}" >> $GITHUB_ENV
-          echo "APP_CUSTOM_ID=${ADDR[1]}" >> $GITHUB_ENV
-          echo "message=${ADDR[2]}" >> $GITHUB_ENV
+          echo "Environment: ${{ env.Environment }}"
+          echo "APP_CUSTOM_ID: ${{ env.APP_CUSTOM_ID }}"
+          echo "message: ${{ env.message }}"
