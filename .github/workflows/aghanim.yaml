@@ -20,19 +20,25 @@ jobs:
         yaml_content=$(cat build/pepperx/destination.yaml)
         
         # Use yq to extract the value of the "environment" key
-        environment_value=$(echo "$yaml_content" | yq e '.environment' -)
+        var_environment=$(echo "$yaml_content" | yq e '.environment' -)
+        var_app_custom_id=$(echo "$yaml_content" | yq e '.app_custom_id' -)
+        var_message=$(echo "$yaml_content" | yq e '.message' -)
         
-        # Set the environment_value as an environment variable for this step
-        echo "Environment Value:"
-        echo "ENVIRONMENT_VALUE=$environment_value" >> $GITHUB_ENV
+        # Set the var_environment as an environment variable for this step
+        echo "var_environment=$var_environment" >> $GITHUB_ENV
+        echo "var_app_custom_id=$var_app_custom_id" >> $GITHUB_ENV
+        echo "var_message=$var_message" >> $GITHUB_ENV
 
     - name: Make a Curl Call
       run: |
-        # Access the environment_value from the environment variable
-        environment_value="${{ env.ENVIRONMENT_VALUE }}"
-        echo "Environment Value:"
-        echo "$environment_value"
+        # Access the var_environment from the environment variable
+        var_environment="${{ env.var_environment }}"
+        var_app_custom_id="${{ env.var_app_custom_id }}"
+        var_message="${{ env.var_message }}"
+
+        echo "Environment Value ARE ---:"
+        echo "$var_environment"
+        echo "$var_app_custom_id"
+        echo "$var_message"
         
-        # Now you can use $environment_value in your curl call
-        # Replace the following line with your actual curl command
-        curl -X GET "https://hunter.nikhilmiranda.com"
+        curl -X GET "https://hunter.nikhilmiranda.com/health"
