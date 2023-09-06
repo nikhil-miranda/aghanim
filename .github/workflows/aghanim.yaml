@@ -6,21 +6,22 @@ on:
 jobs:
   get-commit-message:
     runs-on: ubuntu-latest
-    env:
-      commit_message: ${{ github.event.head_commit.message }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
+      - name: Get commit message
+        run: |
+          commit_message=$(git log --oneline -n 1)
+
       - name: Split commit message
         run: |
-          if [[ "${commit_message}" == * "---"* ]]; then
-            commit_message_parts=(${commit_message//---/ })
-          else
-            commit_message_parts=(""$commit_message"")
-          fi
-      - name: Store splitted message
+          commit_message_parts=($commit_message//---/)
+
+      - name: Check if commit message was split into 3 parts
         run: |
-          echo "summary=${commit_message_parts[0]}"
-          echo "body=${commit_message_parts[1]}"
-          echo "footer=${commit_message_parts[2]}"
+          if [ ${#commit_message_parts[@]} -eq 3 ]; then
+            echo "The commit message was split into 3 parts."
+            summary=${commit_message_parts[0]}
+            body=${commit_message_parts[1]}
+            footer=${commit_message_parts[2]}
+          else
+            echo "The commit message was not split into 3 parts."
+          fi
