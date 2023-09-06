@@ -22,6 +22,6 @@ jobs:
         id: split
         run: |
           IFS='---' read -ra ADDR <<< "${{ env.message }}"
-          for i in "${ADDR[@]}"; do
-            echo "part: $i"
-          done
+          echo "Environment=${ADDR[0]}" >> $GITHUB_ENV
+          echo "APP_CUSTOM_ID=${ADDR[1]}" >> $GITHUB_ENV
+          echo "message=${ADDR[2]}" >> $GITHUB_ENV
