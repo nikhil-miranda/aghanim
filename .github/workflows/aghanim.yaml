@@ -1,30 +1,26 @@
-name: Get commit message
+name: Read and Print Yaml File
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  get-commit-message:
+  read-json:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Get commit message
-        run: |
-          commit_message=$(git log --oneline -n 1)
-
-      - name: Split commit message
-        run: |
-          commit_message_parts=($commit_message//---/)
-
-      - name: Check if commit message was split into 3 parts
-        run: |
-          if [ ${#commit_message_parts[@]} -eq 3 ]; then
-            echo "The commit message was split into 3 parts."
-            summary=${commit_message_parts[0]}
-            body=${commit_message_parts[1]}
-            footer=${commit_message_parts[2]}
-          else
-            echo "The commit message was not split into 3 parts."
-          fi
+    - name: Read and Print YAML File
+      run: |
+        # Read the contents of ./build/pepperx/destination.yaml
+        yaml_content=$(cat build/pepperx/destination.yaml)
+        
+        # Use yq to extract the value of the "environment" key
+        environment_value=$(echo "$yaml_content" | yq e '.environment' -)
+        
+        # Print the environment value
+        echo "Environment Value:"
+        echo "$environment_value"
