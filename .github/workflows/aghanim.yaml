@@ -1,32 +1,30 @@
-name: Process Commit Message
+name: Split Commit Message
 
-on: 
+on:
   push:
     branches:
-      - '**'
+      - main # You can specify the branch you want to trigger this on
 
 jobs:
-  split-message:
+  split-commit-message:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Get commit message
-        id: commit
+      - name: Get Commit Message
+        id: commit_message
         run: |
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.event.after }})
-          echo "message=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          commit_message="$(git log --format=%B -n 1 ${{ github.sha }})"
+          echo "::set-output name=message::$commit_message"
 
-      - name: Split commit message
-        id: split
-        uses: ./.github/actions/split-commit-message
-        with:
-          delimiter: '---'
-          message: ${{ env.message }}
-
-      - name: Print environment variables
+      - name: Split Commit Message
+        id: split_message
+        if: steps.commit_message.outputs.message != ''
         run: |
-          echo "Environment: ${{ env.Environment }}"
-          echo "APP_CUSTOM_ID: ${{ env.APP_CUSTOM_ID }}"
-          echo "message: ${{ env.message }}"
+          commit_message="${{ steps.commit_message.outputs.message }}"
+          IFS='---' read -ra message_parts <<< "$commit_message"
+          for part in "${message_parts[@]}"; do
+            echo "Split Message Part: $part"
+          done
