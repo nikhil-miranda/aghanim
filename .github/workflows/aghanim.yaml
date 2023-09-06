@@ -1,42 +1,26 @@
-name: Extract Commit Message
-
+name: Get commit message
 on:
   push:
     branches:
-      - main # Replace with the branch you want to trigger the workflow on
-
+      - main
 jobs:
-  extract_commit_message:
+  get-commit-message:
     runs-on: ubuntu-latest
-
+    env:
+      commit_message: ${{ github.event.head_commit.message }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set Commit Message Environment Variable
-        id: set_commit_message
+        uses: actions/checkout@v2
+      
+      - name: Split commit message
         run: |
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.sha }} | tr -d '\r') # Remove Windows line endings
-          echo "Commit Message: $COMMIT_MESSAGE"
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-        
-      - name: Split Commit Message
-        id: split_commit_message
+          if [[ "${commit_message}" == * "---"* ]]; then
+            commit_message_parts=(${commit_message//---/ })
+          else
+            commit_message_parts=(""$commit_message"")
+          fi
+      - name: Store splitted message
         run: |
-          SPLIT_MESSAGES=($(echo "$COMMIT_MESSAGE" | tr '---' '\n'))
-          echo "Split Messages: ${SPLIT_MESSAGES[@]}"
-          if [ "${#SPLIT_MESSAGES[@]}" -ge 1 ]; then
-            echo "SPLIT_MESSAGE_1=${SPLIT_MESSAGES[0]}" >> $GITHUB_ENV
-          fi
-          if [ "${#SPLIT_MESSAGES[@]}" -ge 2 ]; then
-            echo "SPLIT_MESSAGE_2=${SPLIT_MESSAGES[1]}" >> $GITHUB_ENV
-          fi
-          if [ "${#SPLIT_MESSAGES[@]}" -ge 3 ]; then
-            echo "SPLIT_MESSAGE_3=${SPLIT_MESSAGES[2]}" >> $GITHUB_ENV
-          fi
-
-      - name: Use the Split Messages
-        run: |
-          echo "Split Message 1: ${{ env.SPLIT_MESSAGE_1 }}"
-          echo "Split Message 2: ${{ env.SPLIT_MESSAGE_2 }}"
-          echo "Split Message 3: ${{ env.SPLIT_MESSAGE_3 }}"
+          echo "summary=${commit_message_parts[0]}"
+          echo "body=${commit_message_parts[1]}"
+          echo "footer=${commit_message_parts[2]}"
