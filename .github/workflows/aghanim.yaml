@@ -18,16 +18,16 @@ jobs:
         run: |
           COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.sha }})
           echo "Commit Message: $COMMIT_MESSAGE"
-          echo "::set-env name=COMMIT_MESSAGE::$COMMIT_MESSAGE"
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
         
       - name: Split Commit Message
         id: split_commit_message
         run: |
           IFS='---' read -ra SPLIT_MESSAGES <<< "${{ env.COMMIT_MESSAGE }}"
           echo "Split Messages: ${SPLIT_MESSAGES[@]}"
-          echo "::set-env name=SPLIT_MESSAGE_1::${SPLIT_MESSAGES[0]}"
-          echo "::set-env name=SPLIT_MESSAGE_2::${SPLIT_MESSAGES[1]}"
-          echo "::set-env name=SPLIT_MESSAGE_3::${SPLIT_MESSAGES[2]}"
+          echo "SPLIT_MESSAGE_1=${SPLIT_MESSAGES[0]}" >> $GITHUB_ENV
+          echo "SPLIT_MESSAGE_2=${SPLIT_MESSAGES[1]}" >> $GITHUB_ENV
+          echo "SPLIT_MESSAGE_3=${SPLIT_MESSAGES[2]}" >> $GITHUB_ENV
 
       - name: Use the Split Messages
         run: |
