@@ -16,7 +16,7 @@ jobs:
       - name: Set Commit Message Environment Variable
         id: set_commit_message
         run: |
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.sha }})
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.sha }} | tr -d '\r') # Remove Windows line endings
           echo "Commit Message: $COMMIT_MESSAGE"
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
         
